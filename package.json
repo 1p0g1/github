@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "build:dictionary": "npx tsx scripts/build-dictionary.ts",
+    "build:dictionary": "pip3 install nltk --quiet && python3 scripts/build-dictionary.py",
     "play": "npx tsx scripts/play-cli.ts"
   },
   "dependencies": {
