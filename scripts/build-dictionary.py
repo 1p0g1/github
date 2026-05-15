@@ -66,18 +66,15 @@ def _synset_is_proper(synset) -> bool:
 
 def has_common_noun_meaning(word: str) -> bool:
     """
-    True if the word's PRIMARY (most-frequent) noun synset is a common noun,
-    OR if it has any non-proper synset and its first synset is not from a
-    clear proper-noun lexname.  This keeps 'john' (toilet) and 'amazon'
-    (fierce woman / bird) while excluding 'paris' (city first, plant second).
+    True if the word has at least one noun synset whose lexicographer category
+    is not a dedicated proper-noun domain.  The three PROPER_LEXNAMES cover
+    named people, places, and organisations — enough to exclude 'einstein',
+    'mary', 'london' etc. while keeping words that have a genuine common
+    meaning even when they are also proper names ('paris' = a plant genus,
+    'john' = a toilet, 'amazon' = a fierce woman / a parrot).
     """
     synsets = wn.synsets(word, pos='n')
-    if not synsets:
-        return False
-    # Primary meaning check: if the first synset is a proper noun, reject
-    if _synset_is_proper(synsets[0]) or synsets[0].lexname() in PROPER_LEXNAMES:
-        return False
-    return True
+    return any(s.lexname() not in PROPER_LEXNAMES for s in synsets)
 
 def is_valid_base(base: str, pos: str) -> bool:
     """True if this base form is an acceptable (non-proper) word."""

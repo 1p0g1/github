@@ -11,12 +11,14 @@ export function useGame(trie: Trie): {
   const reducer = createReducer(trie);
   const [state, dispatch] = useReducer(reducer, initialState);
 
-  // Use a ref to hold the latest state so effects don't have stale closures
   const stateRef = useRef(state);
   stateRef.current = state;
 
   useEffect(() => {
-    const { phase, prefix, settings } = state;
+    const { phase, settings } = state;
+
+    // In PVP mode there is no bot — both turns wait for human input
+    if (settings.mode === 'pvp') return;
 
     if (phase === 'bot-turn') {
       const timer = setTimeout(() => {
@@ -46,18 +48,12 @@ export function useGame(trie: Trie): {
         if (current.phase !== 'bot-challenged') return;
 
         const word = getBotProofWord(current.prefix, trie);
-        dispatch({
-          type: 'BOT_PROVE_WORD',
-          payload: { word: word ?? '' },
-        });
+        dispatch({ type: 'BOT_PROVE_WORD', payload: { word: word ?? '' } });
       }, 900);
 
       return () => clearTimeout(timer);
     }
 
-    // These are just used to avoid "no-unused-vars" on the destructured values
-    void prefix;
-    void settings;
     return undefined;
   }, [state.phase, state.prefix, trie, state.settings]);
 

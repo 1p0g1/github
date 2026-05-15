@@ -21,8 +21,11 @@ export const initialState: GameState = {
   losingReason: '',
   botProofWord: null,
   settings: {
+    mode: 'pvb',
     difficulty: 'medium',
     minWordLength: 4,
+    player1Name: 'Player 1',
+    player2Name: 'Player 2',
   },
 };
 

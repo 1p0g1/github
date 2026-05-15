@@ -1,55 +1,66 @@
 import { GameState } from '../types/game';
 
-interface StatusBarProps {
-  state: GameState;
-}
+interface Props { state: GameState }
 
-function getStatusInfo(state: GameState): { message: string; className: string } {
-  const { phase, prefix } = state;
+export function StatusBar({ state }: Props) {
+  const { phase, prefix, settings } = state;
+  const { mode, player1Name, player2Name } = settings;
+  const isPvP = mode === 'pvp';
+  const p = prefix.toUpperCase();
+
+  let msg = '';
+  let cls = 'status-bar';
 
   switch (phase) {
     case 'idle':
-      return { message: 'Press "Start Game" to begin!', className: '' };
+      msg = 'Choose a mode to get started';
+      break;
 
     case 'human-turn':
-      if (prefix.length === 0) {
-        return { message: 'Your turn — add the first letter!', className: 'human-turn' };
-      }
-      return {
-        message: `Your turn — add a letter or challenge the bot's last move`,
-        className: 'human-turn',
-      };
+      cls += ' human-turn';
+      msg = isPvP
+        ? prefix.length === 0
+          ? `${player1Name}'s turn — add the first letter`
+          : `${player1Name}'s turn — add a letter or challenge`
+        : prefix.length === 0
+          ? 'Your turn — add the first letter'
+          : `Your turn — add a letter or challenge the bot`;
+      break;
 
     case 'bot-turn':
-      return { message: 'Bot is thinking...', className: 'bot-turn' };
+      if (isPvP) {
+        cls += ' human-turn';
+        msg = prefix.length === 0
+          ? `${player2Name}'s turn — add the first letter`
+          : `${player2Name}'s turn — add a letter or challenge`;
+      } else {
+        cls += ' bot-turn';
+        msg = 'Bot is thinking…';
+      }
+      break;
 
     case 'human-challenged':
-      return {
-        message: `Bot challenged! Prove a word starting with "${prefix.toUpperCase()}"`,
-        className: 'challenged',
-      };
+      cls += ' challenged';
+      msg = isPvP
+        ? `${player2Name} challenges ${player1Name}! Prove a word starting with "${p}"`
+        : `Bot challenges you! Prove a word starting with "${p}"`;
+      break;
 
     case 'bot-challenged':
-      return {
-        message: `You challenged the bot! Waiting for bot to prove a word...`,
-        className: 'challenged',
-      };
+      cls += ' challenged';
+      msg = isPvP
+        ? `${player1Name} challenges ${player2Name}! Prove a word starting with "${p}"`
+        : `You challenged the bot — waiting for its response…`;
+      break;
 
     case 'game-over': {
-      const whoWon = state.winner === 'human' ? 'You win!' : 'Bot wins!';
-      return { message: whoWon, className: '' };
+      const winnerName = state.winner === 'human'
+        ? (isPvP ? player1Name : 'You')
+        : (isPvP ? player2Name : 'Bot');
+      msg = `${winnerName} wins!`;
+      break;
     }
-
-    default:
-      return { message: '', className: '' };
   }
-}
 
-export function StatusBar({ state }: StatusBarProps) {
-  const { message, className } = getStatusInfo(state);
-  return (
-    <div className={`status-bar ${className}`}>
-      {message}
-    </div>
-  );
+  return <div className={cls}>{msg}</div>;
 }

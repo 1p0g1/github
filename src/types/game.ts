@@ -1,16 +1,21 @@
 export type Difficulty = 'easy' | 'medium' | 'hard';
+export type GameMode = 'pvb' | 'pvp';
 export type Player = 'human' | 'bot';
+
 export type GamePhase =
   | 'idle'
   | 'human-turn'
   | 'bot-turn'
-  | 'human-challenged'  // bot challenged human; human must prove word
-  | 'bot-challenged'    // human challenged bot; bot must prove word (auto)
+  | 'human-challenged'  // needs to prove word (challenged by bot or player2)
+  | 'bot-challenged'    // bot or player2 needs to prove word
   | 'game-over';
 
 export interface GameSettings {
+  mode: GameMode;
   difficulty: Difficulty;
-  minWordLength: number; // 3-6, default 4
+  minWordLength: number;
+  player1Name: string;
+  player2Name: string;
 }
 
 export interface GameState {
@@ -20,6 +25,6 @@ export interface GameState {
   winner: Player | null;
   loser: Player | null;
   losingReason: string;
-  botProofWord: string | null; // word bot used to prove during bot-challenged
+  botProofWord: string | null;
   settings: GameSettings;
 }
