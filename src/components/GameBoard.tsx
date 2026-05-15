@@ -57,7 +57,7 @@ export function GameBoard({ trie }: GameBoardProps) {
   return (
     <div className="app">
       <header className="app-header">
-        <h1>Ghost</h1>
+        <h1>Word Chain</h1>
         <p className="subtitle">The word fragment game</p>
       </header>
 
